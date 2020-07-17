@@ -822,7 +822,7 @@ void include_push(char *filename) {
     std::string strPath = new_file.toStdString();
     FILE *f = fopen(strPath.c_str(), "r");
     if (!f)
-        printf("Unable to open included scene file \"%s\"", strPath.c_str());
+        printf("Unable to open included scene file \"%s\"\n", strPath.c_str());
     else {
 
         IncludeInfo ii;

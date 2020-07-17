@@ -9,6 +9,7 @@
 #include <QHash>
 #include <QList>
 #include <QtWebSockets/QWebSocket>
+#include <pthread.h>
 class QThread;
 class QSerialPort;
 class DBCLoader;
@@ -16,13 +17,13 @@ class Sender;
 
 enum INSTRUCTION
 {
-    PUSH,
-    ACTIVATE,
-    CALL,
-    REBOOT,
-    POP,
-    COPY,
-    TERMINATE
+    PUSH = 0,
+    ACTIVATE = 1,
+    CALL = 2,
+    REBOOT = 3,
+    POP = 4,
+    COPY = 5,
+    TERMINATE = 6
 };
 
 struct FRAME;
@@ -194,6 +195,18 @@ public:
     virtual ~Tester() override;
 public:
     bool Init2();
+    static void* ReadEthernetThread(void* _ptr);
+    pthread_t m_thread = 0;
+    pthread_mutex_t m_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_cond_t m_thread_cond = PTHREAD_COND_INITIALIZER;
+
+    void connectEthernet();
+    bool mConnectedEthernetState = false;
+
+    void printSYMBOL(SYMBOL* value);
+    void printevalType(evalType value);
+    void printCANMSG(CANMSG* value);
+    void printFRAME_SIGNAL(FRAME_SIGNAL* value);
 
 
 Q_SIGNALS:

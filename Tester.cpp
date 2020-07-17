@@ -17,7 +17,7 @@ extern QVector<CANMSG*> vec;
 void Tester::OnConsoleBootComplete()
 {
     qDebug() << Q_FUNC_INFO;
-    printf("Boot Complete\n");
+    qDebug("Boot Complete\n");
     mBootReady = true;
 }
 
@@ -26,7 +26,7 @@ void Tester::waitUntil(int flags)
     qDebug() << Q_FUNC_INFO;
     //mProg.append(WAIT_UNTIL_BOOT_READY);
 
-    printf("waitUntil = %d\n", flags);
+    qDebug("waitUntil = %d\n", flags);
 }
 
 void Tester::readData()
@@ -66,21 +66,25 @@ void Tester::readData()
         //LayerManagerControl dump screen 0 to /data/ccc.bmp
         mConsole->waitForBytesWritten(-1);
         mConsole->flush();
-        printf("Loggin Successfully\n");
+        qDebug("Loggin Successfully\n");
     }
 }
 
 void Tester::WaitForBootReady()
 {
     qDebug() << Q_FUNC_INFO;
-    //printf("WaitForBootReady\n");
+    //qDebug("WaitForBootReady\n");
     //return;
 
 }
 
+//val cycle
+
 void writeBits(FRAME_SIGNAL* s, double val, unsigned char data[])
 {
     qDebug() << Q_FUNC_INFO;
+
+
     int n = s->start / 8;
     int nn = s->start % 8;
     int vvv = 0;
@@ -105,6 +109,8 @@ void writeBits(FRAME_SIGNAL* s, double val, unsigned char data[])
 
     for (int i = 0; i < nsize; i++)
         data[n + i] |= p[i];
+
+    qDebug() << Q_FUNC_INFO << "end";
 }
 
 
@@ -113,13 +119,15 @@ void Tester::DoCopy(SYMBOL *a, SYMBOL *b)
     qDebug() << Q_FUNC_INFO;
     if (a->type == DT_CANSIG)
     {
-        printf("can signal %s = %s\n", a->name, b->name);
+        qDebug() << Q_FUNC_INFO << "if (a->type == DT_CANSIG)";
+        qDebug("can signal %s = %s\n", a->name, b->name);
         mutex.lock();
         writeBits(a->val.sig->s, atof(b->name), a->val.sig->msg->data);
         mutex.unlock();
     }
     else if (a->type == DT_VAR)
     {
+        qDebug() << Q_FUNC_INFO << "else if (a->type == DT_VAR)";
         const QString name(a->name);
 
         if (name == "Bp")
@@ -143,15 +151,18 @@ void Tester::DoCopy(SYMBOL *a, SYMBOL *b)
              else
                  this->CANDisconnectChanels(0);
         }
-        printf("%s = %s\n", a->name, b->name);
+        qDebug("%s = %s\n", a->name, b->name);
+    } else {
+        qDebug() << Q_FUNC_INFO << "else";
     }
 }
 
 void Tester::DoActivate(SYMBOL *sym)
 {
-    qDebug() << Q_FUNC_INFO;
+
+
     mutex.lock();
-    printf("activate : %s\n", sym->name);
+    qDebug("activate : %s\n", sym->name);
     vec.append(sym->val.msg);
     mutex.unlock();
 }

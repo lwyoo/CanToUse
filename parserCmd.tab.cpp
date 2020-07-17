@@ -1718,11 +1718,14 @@ static int readTC(Tester *pTester, const char *filePath)
 
 bool Tester::ReadTestCase(const char *filePath)
 {
+    qDebug() << Q_FUNC_INFO;
     mProg.clear();
     mStack.clear();
 
     ::readTC(this, filePath);
     mProg.append(TERMINATE);
+
+
     return true;
 }
 

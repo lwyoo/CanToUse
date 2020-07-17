@@ -1,0 +1,16 @@
+#this is an line comment
+Include "4WD_DIAG.tc";
+Include "4WD_LOCK.tc";
+Include "ABS.tc";
+Include "AIR_BAG.tc";
+Include "AUTO_HOLD.tc";
+Include "BATTERY_CHARGE.tc";
+Include "CHECK_ENGINE.tc";
+Include "DBC.tc";
+#Include "ECALL.tc";
+Include "EPB.tc";
+Include "SEAT_BELT.tc"
+Include "TAIL_LAMP.tc";
+Include "TPMS.tc";
+Include "TRUNK_OPEN.tc";
+Include "TURN_SIGNAL.tc";
