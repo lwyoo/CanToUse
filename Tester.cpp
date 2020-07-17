@@ -123,6 +123,9 @@ void Tester::DoCopy(SYMBOL *a, SYMBOL *b)
         qDebug("can signal %s = %s\n", a->name, b->name);
         mutex.lock();
         writeBits(a->val.sig->s, atof(b->name), a->val.sig->msg->data);
+        for (int i = 0 ; i < a->val.sig->msg->dlc ; i++) {
+            qDebug("@@@@@@@@@@@ make data index [%d] data [%d]", i, a->val.sig->msg->data[i]);
+        }
         mutex.unlock();
     }
     else if (a->type == DT_VAR)

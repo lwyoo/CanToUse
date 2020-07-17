@@ -208,6 +208,7 @@ public:
     void printCANMSG(CANMSG* value);
     void printFRAME_SIGNAL(FRAME_SIGNAL* value);
 
+    QWebSocket m_webSocket;
 
 Q_SIGNALS:
     void closed();
@@ -216,7 +217,6 @@ private Q_SLOTS:
     void onConnected();
     void onTextMessageReceived(QString message);
 private:
-    QWebSocket m_webSocket;
     QUrl m_url;
     bool m_debug;
 };

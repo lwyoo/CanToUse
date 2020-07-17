@@ -12,6 +12,8 @@
 #include <QCanBusFrame>
 #include "CANFile_global.h"
 
+//std::unique_ptr<QWebSocket> m_webSocket;
+
 bool Tester::Init2()
 {
     qDebug() << Q_FUNC_INFO;
@@ -33,8 +35,10 @@ class Sender : public QThread
 {
 public:
     virtual void run() override;
+    Sender(Tester* temp);
 private:
     unsigned long mCycle;
+    Tester* mTester;
 };
 
 void* Tester::ReadEthernetThread(void* _ptr)
@@ -275,13 +279,23 @@ void Sender::run()
                 qDebug() << "write data !!!!!!@@@@@@@@@@@@@@@@@@@@@@@";
 
 //                char spedd[8] = {0x10, 0x20, 0x10, 0x20,0x10, 0x20,0x10, 0x20 };
-                char spedd[8] = {0x01, 0x2, 0x3, 0x4,0x5, 0x6,0x7, 0x8 };
+//                char spedd[8] = {0x01, 0x2, 0x3, 0x4,0x5, 0x6,0x7, 0x8 };
 
                 QByteArray data((const char *)m.data, m.dlc);
                 QCanBusFrame frame = QCanBusFrame(m.id, data);
                 frame.setExtendedFrameFormat(false);
                 frame.setFlexibleDataRateFormat(false);
                 frame.setBitrateSwitch(false);
+
+                for (int i = 0 ; i < m.dlc ; i++) {
+                    qDebug("@@@@@@@@ send data  index [%d] data [%d]", i, m.data[i]);
+                }
+
+
+
+                mTester->m_webSocket.sendBinaryMessage(data);
+
+
 
                 //                 m_canDevice->writeFrame(frame);
 
@@ -302,6 +316,11 @@ void Sender::run()
     exit(0);
     // VCI_CloseDevice(VCI_USBCAN2, 0);
     qDebug("Sender Thread Terminated\n");
+}
+
+Sender::Sender(Tester* temp)
+{
+        mTester = temp;
 }
 
 int Tester::GenPushSymbol(const char* id, dataType dt)
@@ -530,7 +549,7 @@ Tester::Tester(QObject* parent) :
 
     Init();
     dl = new DBCLoader;
-    sender = new Sender;
+    sender = new Sender(this);
 
     //    Init2();
 }
