@@ -10,6 +10,7 @@
 #include <QList>
 #include <QtWebSockets/QWebSocket>
 #include <pthread.h>
+#include <QUdpSocket>
 class QThread;
 class QSerialPort;
 class DBCLoader;
@@ -205,17 +206,22 @@ public:
 
     void printSYMBOL(SYMBOL* value);
     void printevalType(evalType value);
+    void printFRAME(FRAME* value);
     void printCANMSG(CANMSG* value);
     void printFRAME_SIGNAL(FRAME_SIGNAL* value);
+    void testWriteDatagrame(const QByteArray &datagram, const QHostAddress &host, quint16 port);
 
     QWebSocket m_webSocket;
+    QUdpSocket *m_udpSocket;
 
 Q_SIGNALS:
     void closed();
+    void testSignalWriteDatagrame(const QByteArray &datagram, const QHostAddress &host, quint16 port);
 
 private Q_SLOTS:
     void onConnected();
     void onTextMessageReceived(QString message);
+    void testSlotWriteDatagrame(const QByteArray &datagram, const QHostAddress &host, quint16 port);
 private:
     QUrl m_url;
     bool m_debug;

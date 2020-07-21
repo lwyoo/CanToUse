@@ -42,9 +42,9 @@ void Tester::readData()
         QByteArray line = mLog.mid(0, index + 1 );
         int i;
         if (mLog.contains("Capture") && mCaptureDone == false)
-           {
-               mCaptureDone = true;
-           }
+        {
+            mCaptureDone = true;
+        }
         
         for (i = 0; i < line.length(); i++)
             putchar(line.data()[i]);
@@ -78,37 +78,80 @@ void Tester::WaitForBootReady()
 
 }
 
-//val cycle
-
 void writeBits(FRAME_SIGNAL* s, double val, unsigned char data[])
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << "input arg val : " << val ;
 
 
-    int n = s->start / 8;
-    int nn = s->start % 8;
-    int vvv = 0;
-    double wval = val;
+    //    SG_ CF_Gway_PDWRsound : 6|2@1+ (1,0) [0|3] ""  CLU
+    //    startbit | length @1+ (factor,offset) [min|max]
+    int startByte = s->start / 8;
+    qDebug() << Q_FUNC_INFO << "s->start / 8 : " << startByte; // 시작 비트 n
+    int startBitValue = s->start % 8;
+    qDebug() << Q_FUNC_INFO << "s->start % 8 : " << startBitValue; // 시프트 연산을 위한 값 startBitValue
+    int maskValue = 0;
+    double rawValue = val;
 
-    if (wval < s->min)
-        wval = s->min;
-    if (wval > s->max)
-        wval = s->max;
+    if (rawValue < s->min)
+        rawValue = s->min;
+    if (rawValue > s->max)
+        rawValue = s->max;
 
-    unsigned char *p = (unsigned char *) &vvv;
-    int nsize = (s->length + 7) / 8;
-    vvv = -1;
-    vvv <<= s->length;
-    vvv <<= nn;
+    unsigned char *p = (unsigned char *) &maskValue;
+    int nsize = (s->length + 7) / 8; // 14 + 7 /8
+    maskValue = -1;
+    maskValue <<= s->length;
+    maskValue <<= startBitValue;
+
+
+    //    0000 0000
+
+    //    0010 0000
+    //    0100 0000
+    //    0110 0000
+    //    1000 0000
+
+//    1000 0000 0110 0000 0100 0000 0010 0000
+
+    //8byte//1111 1111     1111 1111      1111 1111      1111 1111      1111 1111      1111 1111      1100 0000      0000 0000
+    //data //0000 0000     0000 0000      0101 0101      1010 1100      1010 1101      1101 1101      1010 1111      1000 0100
+    //------------------------------------------------------------------------------------------------------------------------
+    //&&&&&//0000 0000     0000 0000      0101 0101      1010 1100      1010 1101      1101 1101      1000 0000      0000 0000
+
+    for (int i = 0; i < nsize; i++) {
+        qDebug() << Q_FUNC_INFO << "data[" << startByte + i << "] : " << data[startByte + i] <<  " p["<< i << "] :  " << p[i];
+        data[startByte + i] &= p[i];
+    }
+
+
+    // rawValue = (physValue - s->offset) / s->factor;
+    // rawValue * s->factor + s->offset = physValue
+    // s->factor * rawValue + s->offset =  physValue
+
+
+
+    maskValue = (rawValue - s->offset) / s->factor;
+    qDebug() << "s->offset : " << s->offset << " s->factor : " << s->factor << " maskValue : " << maskValue  << " rawValue : " << rawValue;
+    maskValue <<= startBitValue;
+    qDebug() << "s->offset : " << s->offset << " s->factor : " << s->factor << " maskValue : " << maskValue  << " rawValue : " << rawValue;
+
 
     for (int i = 0; i < nsize; i++)
-        data[n + i] &= p[i];
+        data[startByte + i] |= p[i];
 
-    vvv = (wval - s->offset) / s->factor;
-    vvv <<= nn;
+    /////////////////
+    //get data test//
+    /////////////////
 
-    for (int i = 0; i < nsize; i++)
-        data[n + i] |= p[i];
+    for (int i = 0; i < nsize; i++) {
+
+        unsigned char tmepValue;
+        qDebug() << "dldyddn data[startByte + " << i << "] : " << data[startByte + i];
+    }
+
+
+
+
 
     qDebug() << Q_FUNC_INFO << "end";
 }
@@ -149,10 +192,10 @@ void Tester::DoCopy(SYMBOL *a, SYMBOL *b)
         }
         else if (name == "CAN")
         {
-             if (b->val.b)
-                 this->CANConnectChanels(0);
-             else
-                 this->CANDisconnectChanels(0);
+            if (b->val.b)
+                this->CANConnectChanels(0);
+            else
+                this->CANDisconnectChanels(0);
         }
         qDebug("%s = %s\n", a->name, b->name);
     } else {
