@@ -123,12 +123,9 @@ void writeBits(FRAME_SIGNAL* s, double val, unsigned char data[])
         data[startByte + i] &= p[i];
     }
 
-
     // rawValue = (physValue - s->offset) / s->factor;
     // rawValue * s->factor + s->offset = physValue
     // s->factor * rawValue + s->offset =  physValue
-
-
 
     maskValue = (rawValue - s->offset) / s->factor;
     qDebug() << "s->offset : " << s->offset << " s->factor : " << s->factor << " maskValue : " << maskValue  << " rawValue : " << rawValue;
@@ -138,20 +135,6 @@ void writeBits(FRAME_SIGNAL* s, double val, unsigned char data[])
 
     for (int i = 0; i < nsize; i++)
         data[startByte + i] |= p[i];
-
-    /////////////////
-    //get data test//
-    /////////////////
-
-    for (int i = 0; i < nsize; i++) {
-
-        unsigned char tmepValue;
-        qDebug() << "dldyddn data[startByte + " << i << "] : " << data[startByte + i];
-    }
-
-
-
-
 
     qDebug() << Q_FUNC_INFO << "end";
 }

@@ -13,6 +13,10 @@
 #include "CANFile_global.h"
 #include <QMetaType>
 #include <cmath>
+
+#define TEST_IP "10.45.143.47"
+#define TEST_PORT 1801
+
 bool Tester::Init2()
 {
     qDebug() << Q_FUNC_INFO;
@@ -185,14 +189,11 @@ void* Tester::ReadEthernetThread(void* _ptr)
 void Tester::connectEthernet()
 {
 
-    //    qDebug() << Q_FUNC_INFO << "WebSocket server:" << QUrl(QStringLiteral("ws://localhost:1234"));
-    //    QUrl tempUrl = QUrl(QStringLiteral("ws://localhost:1234"));
-    //    connect(&m_webSocket, &QWebSocket::connected, this, &Tester::onConnected);
-    //    connect(&m_webSocket, &QWebSocket::disconnected, this, &Tester::closed);
-    //    m_webSocket.open(QUrl(tempUrl));
 
     m_udpSocket = new QUdpSocket(this);
-    m_udpSocket->bind(QHostAddress::LocalHost, 1234);
+//    m_udpSocket->bind(QHostAddress::LocalHost, 1234);
+//    m_udpSocket->bind(QHostAddress("10.45.143.47"),1801,QAbstractSocket::DefaultForPlatform);
+    m_udpSocket->bind(QHostAddress(QString(TEST_IP)), TEST_PORT, QAbstractSocket::DefaultForPlatform);
     connect(m_udpSocket, SIGNAL(readyRead()), this, SLOT(onConnected()));
 
 }
@@ -319,104 +320,6 @@ SYMBOL* SYMBOL_TABLE::Search(const char* name)
     return ret;
 }
 
-
-//void Sender::run()
-//{
-//    qDebug() << Q_FUNC_INFO << "runSenderThread : " << runSenderThread ;
-//    mCycle = 10;
-//    long timeStamp = 0;
-//    QVector<CANMSG> localvec;
-//    bool loop = true;
-
-//    for (;;)
-//    {
-//        int nCount = 0;
-
-//        nCount = 0;
-//        mutex.lock();
-//        if (runSenderThread)
-//        {
-//            qDebug() << Q_FUNC_INFO << "runSenderThread is true";
-//            localvec.clear();
-//            for (CANMSG* m : vec)
-//            {
-//                m->timeStamp -= mCycle;
-//                if (m->timeStamp <= 0)
-//                {
-//                    m->timeStamp += m->cycle;
-//                    localvec.append(*m);
-//                    nCount++;
-//                }
-//            }
-//        }
-//        else
-//        {
-//            loop = false;
-//        }
-//        mutex.unlock();
-//        if (loop == false)
-//            break;
-//        if (localvec.empty() == false)
-//        {
-//            qDebug() << Q_FUNC_INFO << "Sending : " << timeStamp << "\t localvec.size() : " << localvec.size() ;
-//            qDebug("Sending %ld %d msgs\n", timeStamp, localvec.size());
-//            //assa VCI_CAN_OBJ *obj = new VCI_CAN_OBJ[localvec.size()];
-//            //assa VCI_CAN_OBJ *objBase = obj;
-//            // memset(obj, 0, sizeof(VCI_CAN_OBJ) * localvec.size());
-
-
-//            //            qDebug() << "write data !!!!!!@@@@@@@@@@@@@@@@@@@@@@@" << localvec.size();
-//            for (CANMSG& m : localvec)
-//            {
-//                // obj->ID = m.id;
-//                // memcpy(obj->Data , m.data, m.dlc);
-//                // obj->DataLen = m.dlc;
-//                // obj->TimeStamp = timeStamp;
-//                // obj++;
-//                //                char spedd[8] = {0x80, 0x20, 0x80, 0x20,0x80, 0x20,0x80, 0x20 };
-//                qDebug() << "write data !!!!!!@@@@@@@@@@@@@@@@@@@@@@@";
-
-////                char spedd[8] = {0x10, 0x20, 0x10, 0x20,0x10, 0x20,0x10, 0x20 };
-////                char spedd[8] = {0x01, 0x2, 0x3, 0x4,0x5, 0x6,0x7, 0x8 };
-
-//                QByteArray data((const char *)m.data, m.dlc);
-//                QCanBusFrame frame = QCanBusFrame(m.id, data);
-//                frame.setExtendedFrameFormat(false);
-//                frame.setFlexibleDataRateFormat(false);
-//                frame.setBitrateSwitch(false);
-
-//                for (int i = 0 ; i < m.dlc ; i++) {
-//                    qDebug("@@@@@@@@ send data  index [%d] data [%d]", i, m.data[i]);
-//                }
-
-
-
-////                mTester->m_webSocket.sendBinaryMessage(data);
-//                mTester->m_udpSocket->writeDatagram(data, QHostAddress::LocalHost, 1234);
-
-
-
-//                //                 m_canDevice->writeFrame(frame);
-
-//            }
-//            //assa VCI_Transmit(VCI_USBCAN2, 0, 0, objBase, localvec.size());
-//            //delete [] objBase;
-
-//        }
-//        else
-//        {
-//            //qDebug("Sending %ld %d msgs\n", timeStamp, 0);
-//            qDebug() << "Sending : " << timeStamp << "\t localvec.size() : " << 0 ;
-//        }
-//        msleep(mCycle);
-//        timeStamp += mCycle;
-//    }
-//    qDebug() << "Sender Thread Terminated\n";
-//    exit(0);
-//    // VCI_CloseDevice(VCI_USBCAN2, 0);
-//    qDebug("Sender Thread Terminated\n");
-//}
-
 void Sender::run()
 {
     qDebug() << Q_FUNC_INFO << "runSenderThread : " << runSenderThread ;
@@ -489,8 +392,6 @@ void Sender::run()
             /////////////////////
             for (CANMSG& m : localvec)
             {
-                qDebug() << "write data !!!!!!@@@@@@@@@@@@@@@@@@@@@@@";
-
                 QByteArray data((const char *)m.data, m.dlc);
                 QCanBusFrame frame = QCanBusFrame(m.id, data);
                 frame.setExtendedFrameFormat(false);
@@ -538,10 +439,6 @@ void Sender::run()
                     sendData.push_back(attName);
                     sendData.push_back("::");
 
-
-
-
-
                     sendData.push_back(QString::number(rawValue).toStdString().c_str());
 
                     if (i == temp->sigCount -1) {
@@ -559,12 +456,7 @@ void Sender::run()
                 //                }
 
 
-                mTester->testWriteDatagrame(sendData, QHostAddress::LocalHost, 1234);
-
-
-
-
-                qDebug() << "dldyddn : " << sendData;
+                mTester->testWriteDatagrame(sendData, QHostAddress(TEST_IP), TEST_PORT);
             }
             break;
         }
@@ -867,6 +759,7 @@ void Tester::onTextMessageReceived(QString message)
 void Tester::testSlotWriteDatagrame(const QByteArray& datagram, const QHostAddress& host, quint16 port)
 {
     qDebug() << Q_FUNC_INFO;
+    //groupAddress4(QStringLiteral("239.255.43.21")),
     m_udpSocket->writeDatagram(datagram, host, port);
 }
 
